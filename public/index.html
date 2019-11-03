@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>HIDE-A-PASSWORD</title>
+
+    <!-- Bootstrap -->
+    <link href="css/custom.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Import the external JavaScript modules -->
+    <script type="text/javascript" src="lib/aes.js"></script>
+    <script type="text/javascript" src="lib/entropy.js"></script>
+    <script type="text/javascript" src="lib/aesprng.js"></script>
+    <script type="text/javascript" src="lib/lecuyer.js"></script>
+    <script type="text/javascript" src="lib/md5.js"></script>
+    <script type="text/javascript" src="lib/armour.js"></script>
+    <script type="text/javascript" src="lib/utf-8.js"></script>
+    <script type="text/javascript" src="lib/jscrypt.js"></script>
+
+    <script type="text/javascript">
+        // Begin collecting entropy    
+        function nowLoaded() {
+            ce();                           // Add time we got here to entropy
+            mouseMotionEntropy(60);         // Initialise collection of mouse motion entropy
+        }
+    </script>
+
+</head>
+  <body class="bg-light" onload="nowLoaded()">
+    <button type="button" class="btn btn-default btn-lg mx-4 mt-4 float-left"><a href="https://dave-becker.com" style="text-decoration: inherit; color: inherit;">Home</a></button>
+    <div class="container">
+        <div class="pt-5 pb-3 text-center">
+            <h1>HIDE-A-PASSWORD</h1>
+            <p class="lead">
+                This is a simple encryption/decryption algorithm to help keep things from plain-text prying eyes. I adapted this code from various JavaScript found on the Net to allow me to pass passwords via IM.
+            </p>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col">
+                <div class="row justify-content-center pb-3">
+                    <div class="alert alert-danger" role="alert">
+                        No data you enter is ever passed to our server!
+                    </div>
+                </div>
+                <form>
+                    <div class="form-group row">
+                        <label for="message" class="col-sm-2 col-form-label">Message:</label>
+                        <div class="col-sm-8">
+                            <textarea class="form-control" id="message" cols="80" rows="10" onfocus="ce();" onblur="ce();" onkeydown="ce();"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="key" class="col-sm-2 col-form-label">Key:</label>
+                        <div class="col-sm-8">
+                            <input class="form-control" id="key" onfocus="ce();" onblur="ce();" onkeydown="ce();" type="password" data-toggle="password">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-8 offset-2 text-center">
+                            <button type="button" id="copy-btn" class="btn btn-info btn-lg mx-2" data-toggle="tooltip" data-placement="bottom"
+                            title="Copy to Clipboard" onclick="copy_link()" disabled="disabled" >Copy Link</button>
+                            <button type="button" id="encrypt-btn" class="btn btn-success btn-lg mx-2" data-toggle="tooltip" data-placement="bottom"
+                            title="Encrypt text" disabled="disabled" onclick='encrypt_text()'>Encrypt</button>
+                            <button type="button" id="decrypt-btn" class="btn btn-warning btn-lg mx-2" data-toggle="tooltip" data-placement="bottom"
+                            title="Decrypt text" disabled="disabled" onclick='decrypt_text()'>Decrypt</button>
+                            <button type="button" id="clear-btn" class="btn btn-danger border btn-lg mx-2" data-toggle="tooltip" data-placement="bottom"
+                            title="Clear input" onclick='clear_text()'>Clear</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="w-100"><hr></div>
+            <div class="row pt-2">
+                <p class="w-100">This tool can be used as follows:</p>
+                    <ul>
+                        <li> Enter your message to be sent and a key (password) that is known between both parties.</li>
+                        <li>Click <b>Encrypt</b>.</li>
+                        <li> After encrypting, click <b>Copy Link</b>.</li>
+                        <li> Transmit (via Email or IM) the <b>copied URL</b>.</li>
+                        <li> Transmit (via a different method) the <b>KEY</b> (I use Email/IM or IM/EMAIL so the URL and KEY aren't together).</li>
+                        <li> The recipient should click the link, input the key, and then click <b>Decrypt</b>.</li>
+                    </ul>
+                <p>
+                    <b>To increase the security of your message</b>, you can use a multi-pass encrytion.  For instance, enter your message and key then ENCRYPT.  Then leave the encrypted message and choose a new key and ENCRYPT again.  This will ensure that even if the outer key is compromised, the inner key will not.  Additionally, this will make it more difficult for brute-force crackers to decrypt your message.
+                </p>
+            </div>
+            <div class="w-100"><hr></div>
+            <div class="row pb-5 pt-2">
+                <i>This is intended for recreational use only.  No warranty is made on the code or security of the cipher. All code used in this page was borrowed from the public domain.  Never pass personal information via unencrypted means and never share personal information with people you don't know.</i>
+            </div>
+        </div>
+    </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="lib/bootstrap.min.js"></script>
+    <script src="lib/urlsearchparams_poly.js"></script>
+    <script src="js/index.js"></script>
+    <script src="lib/bootstrap-show-password.min.js"></script>
+
+  </body>
+</html>
